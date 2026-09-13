@@ -24,7 +24,6 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
       - name: Update GitOps repository
         shell: bash
@@ -34,25 +33,13 @@ jobs:
           # Configure git credential store
           git config --global credential.helper store
           echo "https://${GIT_TOKEN}:x-oauth-basic@github.com" > ~/.git-credentials
-          
+
           # Remove any existing gitops directory
           rm -rf gitops
-          
+
           # Clone repository using HTTPS URL without token
           git clone https://github.com/rslim087a/grade-api-gitops.git gitops
           cd gitops
-          
+
           if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
-          else
-            sed -i "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
-          fi
-          
-          # Commit changes
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add deployment.yaml
-          git commit -m "Update image to ${{ github.sha }}"
-          
-          # Push
-          git push -f https://${GIT_TOKEN}@github.com/rslim087a/grade-api-gitops.git main
+            sed -i '' "s|image: ghcr.io/${{ github.repository }}:.*|image:
