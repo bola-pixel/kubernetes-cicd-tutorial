@@ -25,6 +25,8 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
       - name: Update GitOps repository
         shell: bash
         env:
@@ -41,16 +43,13 @@ jobs:
           git clone https://github.com/bola-pixel/grade-api-gitops.git gitops
           cd gitops
 
-          if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
-          else
-            sed -i "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
-          fi
+          # Update image tag using Kustomize instead of sed
+          kustomize edit set image ghcr.io/${{ github.repository }}=ghcr.io/${{ github.repository }}:${{ github.sha }}
 
           # Commit changes
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add deployment.yaml
+          git add kustomization.yaml
           git commit -m "Update image to ${{ github.sha }}"
 
           # Push
