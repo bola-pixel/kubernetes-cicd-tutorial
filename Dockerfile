@@ -7,7 +7,7 @@ WORKDIR /app
 COPY src/package*.json ./
 
 # Install with lockfile-exact versions, skip dev deps, skip audit/fund noise
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
 # Copy source code
 COPY src/ ./
